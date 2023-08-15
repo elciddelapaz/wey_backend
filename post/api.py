@@ -1,6 +1,6 @@
 from django.http import JsonResponse
-from .serializers import PostSerializer
-from .models import Post, Like
+from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer
+from .models import Post, Like, Comment
 from account.models import User
 from account.serializers import UserSerializer
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -29,6 +29,14 @@ def post_list_profile(request, id):
     }, safe=False)
 
 
+@api_view(['GET'])
+def post_detail(request, id):
+    post = Post.objects.get(pk=id)
+    return JsonResponse({
+        'post': PostDetailSerializer(post).data
+    })
+
+
 @api_view(['POST'])
 def post_create(request):
     data = request.data
@@ -44,16 +52,29 @@ def post_create(request):
 
 
 @api_view(['POST'])
-def post_like(request, pk):
-    post = Post.objects.get(pk=pk)
+def post_like(request, id):
+    post = Post.objects.get(pk=id)
 
     if not post.likes.filter(created_by=request.user):
         like = Like.objects.create(created_by=request.user)
 
-        post = Post.objects.get(pk=pk)
+        post = Post.objects.get(pk=id)
         post.likes_count += 1
         post.likes.add(like)
         post.save()
         return JsonResponse({'message': 'like created'})
     else:
         return JsonResponse({'message': 'post already liked'})
+
+
+@api_view(['POST'])
+def post_create_comment(request, id):
+    comment = Comment.objects.create(
+        body=request.data.get('body'), created_by=request.user)
+    post = Post.objects.get(pk=id)
+    post.comments.add(comment)
+    post.comments_count += 1
+    post.save()
+
+    serializer = CommentSerializer(comment)
+    return JsonResponse(serializer.data, safe=False)
