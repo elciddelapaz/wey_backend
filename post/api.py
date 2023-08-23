@@ -48,12 +48,14 @@ def get_trends(request):
 
 @api_view(['POST'])
 def post_create(request):
-    data = request.data
     form = PostForm(request.data)
     if (form.is_valid()):
         post = form.save(commit=False)
         post.created_by = request.user
         post.save()
+        user = request.user
+        user.posts_count += 1
+        user.save()
         serializer = PostSerializer(post)
         return JsonResponse(serializer.data, safe=False)
     else:
