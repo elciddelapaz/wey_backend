@@ -5,7 +5,8 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'friends_count', 'posts_count')
+        fields = ('id', 'name', 'email', 'friends_count',
+                  'posts_count', 'get_avatar')
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
