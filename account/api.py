@@ -8,11 +8,12 @@ from .serializers import UserSerializer, FriendRequestSerializer
 @api_view(['GET'])
 def me(request):
     return JsonResponse(
-        {'id': request.user.id,
-         'name': request.user.name,
-         'email': request.user.email,
-         'avatar': request.user.get_avatar()
-         }
+        {
+            'id': request.user.id,
+            'name': request.user.name,
+            'email': request.user.email,
+            'avatar': request.user.get_avatar()
+        }
     )
 
 
@@ -96,4 +97,6 @@ def edit_profile(request):
         form = ProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-        return JsonResponse({'message': 'success'})
+
+        serializer = UserSerializer(user)
+        return JsonResponse({'message': 'success', 'user': serializer.data})
