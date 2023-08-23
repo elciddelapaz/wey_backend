@@ -33,9 +33,8 @@ def signup(request):
     if form.is_valid():
         form.save()
     else:
-        message = 'error'
-
-    return JsonResponse({'message': message})
+        message = form.errors.as_json()
+    return JsonResponse({'message': message}, safe=False)
 
 
 @api_view(['GET'])
