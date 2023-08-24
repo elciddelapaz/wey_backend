@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 AUTH_USER_MODEL = 'account.User'
 
 SIMPLE_JWT = {
