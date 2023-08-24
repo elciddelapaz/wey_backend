@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from .forms import SignupForm, ProfileForm
+from .forms import SignupForm, ProfileForm, PasswordChangeForm
 from .models import User, FriendRequest
 from .serializers import UserSerializer, FriendRequestSerializer
 
@@ -99,3 +99,14 @@ def edit_profile(request):
 
         serializer = UserSerializer(user)
         return JsonResponse({'message': 'success', 'user': serializer.data})
+
+
+@api_view(['POST'])
+def edit_password(request):
+    user = request.user
+    form = PasswordChangeForm(data=request.POST, user=user)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({'message': 'success'})
+    else:
+        return JsonResponse({'message': form.errors.as_json()}, safe=False)
