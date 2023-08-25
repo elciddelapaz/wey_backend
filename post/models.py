@@ -32,7 +32,6 @@ class PostAttachment(models.Model):
         User, related_name='post_attachments', on_delete=models.CASCADE)
 
     def get_image(self):
-        print(self.image)
         if self.image:
             return 'http://127.0.0.1:8000/' + self.image.url
         else:

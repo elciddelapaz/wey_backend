@@ -4,6 +4,7 @@ from .forms import SignupForm, ProfileForm, PasswordChangeForm
 from .models import User, FriendRequest
 from .serializers import UserSerializer, FriendRequestSerializer
 from django.core.mail import send_mail
+from notification.utils import create_notification
 
 
 @api_view(['GET'])
@@ -70,7 +71,10 @@ def send_friend_request(request, pk):
     check2 = FriendRequest.objects.filter(
         created_for=user).filter(created_by=request.user)
     if not check1 or not check2:
-        FriendRequest.objects.create(created_for=user, created_by=request.user)
+        friend_request = FriendRequest.objects.create(
+            created_for=user, created_by=request.user)
+        create_notification(request, 'newfriendrequest',
+                            friend_request_id=friend_request.id)
         return (JsonResponse({'message': 'friend request sent'}))
     else:
         return (JsonResponse({'message': 'request already sent'}))
@@ -91,6 +95,9 @@ def handle_request(request, pk, status):
     request_user = request.user
     request_user.friends_count += 1
     request_user.save()
+
+    create_notification(request, 'acceptedfriendrequest',
+                        friend_request_id=friend_request.id)
 
     return (JsonResponse({'message': 'friend request updated'}))
 
