@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer
 from .models import Post, Like, Comment, Trend
-from account.models import User
+from account.models import User, FriendRequest
 from account.serializers import UserSerializer
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .forms import PostForm, AttachmentForm
@@ -27,9 +27,23 @@ def post_list_profile(request, id):
     posts = Post.objects.filter(created_by_id=id)
     post_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
+
+    can_send_friend_request = True
+
+    if (request.user in user.friends.all()):
+        can_send_friend_request = False
+
+    check1 = FriendRequest.objects.filter(
+        created_for=request.user).filter(created_by=user)
+    check2 = FriendRequest.objects.filter(
+        created_for=user).filter(created_by=request.user)
+
+    if check1 or check2:
+        can_send_friend_request = False
     return JsonResponse({
         'posts': post_serializer.data,
-        'user': user_serializer.data
+        'user': user_serializer.data,
+        'can_send_friend_request': can_send_friend_request
     }, safe=False)
 
 
