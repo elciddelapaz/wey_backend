@@ -42,6 +42,7 @@ class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     body = models.TextField(blank=True, null=True)
     attachment = models.ManyToManyField(PostAttachment, blank=True)
+    is_private = models.BooleanField(default=False)
     likes = models.ManyToManyField(Like, blank=True)
     likes_count = models.IntegerField(default=0)
     comments = models.ManyToManyField(Comment, blank=True)
