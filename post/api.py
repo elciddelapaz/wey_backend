@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.db.models import Q
 from .serializers import PostSerializer, PostDetailSerializer, CommentSerializer, TrendSerializer
 from .models import Post, Like, Comment, Trend
 from account.models import User, FriendRequest
@@ -16,7 +17,8 @@ def post_list(request):
     posts = Post.objects.filter(created_by_id__in=list(user_ids))
     trend = request.GET.get('trend', '')
     if trend:
-        posts = posts.filter(body__icontains='#' + trend)
+        posts = posts.filter(body__icontains='#' +
+                             trend).filter(is_private=False)
     serializer = PostSerializer(posts, many=True)
     return JsonResponse(serializer.data, safe=False)
 
@@ -25,6 +27,10 @@ def post_list(request):
 def post_list_profile(request, id):
     user = User.objects.get(pk=id)
     posts = Post.objects.filter(created_by_id=id)
+
+    if not request.user in user.friends.all():
+        posts = posts.filter(is_private=False)
+
     post_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
 
@@ -49,7 +55,11 @@ def post_list_profile(request, id):
 
 @api_view(['GET'])
 def post_detail(request, id):
-    post = Post.objects.get(pk=id)
+    user_ids = [request.user.id]
+    for user in request.user.friends.all():
+        user_ids.append(user.id)
+    post = Post.objects.filter(
+        Q(created_by_id__in=list(user_ids)) | Q(is_private=False)).get(pk=id)
     return JsonResponse({
         'post': PostDetailSerializer(post).data
     })
