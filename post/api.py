@@ -127,3 +127,10 @@ def post_create_comment(request, id):
     create_notification(request, 'postcomment', post_id=post.id)
     serializer = CommentSerializer(comment)
     return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['DELETE'])
+def post_delete(request, id):
+    post = Post.objects.filter(created_by=request.user).get(id=id)
+    post.delete()
+    return JsonResponse({'message': 'deleted'})
