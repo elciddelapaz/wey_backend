@@ -129,6 +129,14 @@ def post_create_comment(request, id):
     return JsonResponse(serializer.data, safe=False)
 
 
+@api_view(['POST'])
+def post_report(request, id):
+    post = Post.objects.get(id=id)
+    post.reported_by.add(request.user)
+    post.save()
+    return JsonResponse({'message': 'post reported'})
+
+
 @api_view(['DELETE'])
 def post_delete(request, id):
     post = Post.objects.filter(created_by=request.user).get(id=id)

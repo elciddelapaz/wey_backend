@@ -51,6 +51,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         User, related_name='posts', on_delete=models.CASCADE)
+    reported_by = models.ManyToManyField(User, blank=True)
 
     class Meta:
         ordering = ('-created_at',)
