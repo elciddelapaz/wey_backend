@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-rj9pkj+i-d=c02m+&9+1+fzm7i5n-i=6bvs-eax4yj1zfg=0x)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['.vercel.app']
 
@@ -50,11 +50,11 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173'
+    'https://wey-frontend-jet.vercel.app/'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:5173'
+    'https://wey-frontend-jet.vercel.app/'
 ]
 
 INSTALLED_APPS = [
